@@ -1,0 +1,37 @@
+name: Sync Upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * 1"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Sync upstream master
+        run: |
+          git remote add upstream https://github.com/ChaoningZhang/MobileSAM.git || true
+          git fetch upstream master
+          git checkout main
+          before=$(git rev-parse HEAD)
+          git rebase upstream/master
+          after=$(git rev-parse HEAD)
+          if [ "$before" = "$after" ]; then
+            echo "No upstream changes to apply."
+            exit 0
+          fi
+          git push origin HEAD:main
