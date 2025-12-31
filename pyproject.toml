@@ -15,16 +15,16 @@ authors = [
 maintainers = [
   { name = "Artificial Sweetener" }
 ]
-urls = {
-  "Homepage" = "https://github.com/ChaoningZhang/MobileSAM",
-  "Mirror" = "https://github.com/Artificial-Sweetener/MobileSAM-Mirror"
-}
 
 dependencies = []
 
 [project.optional-dependencies]
 all = ["matplotlib", "pycocotools", "opencv-python", "onnx", "onnxruntime"]
 dev = ["flake8", "isort", "black", "mypy"]
+
+[project.urls]
+Homepage = "https://github.com/ChaoningZhang/MobileSAM"
+Mirror = "https://github.com/Artificial-Sweetener/MobileSAM-Mirror"
 
 [tool.setuptools.packages.find]
 include = ["mobile_sam", "mobile_sam.*"]
