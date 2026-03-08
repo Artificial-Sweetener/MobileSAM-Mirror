@@ -2,8 +2,10 @@ name: Sync Upstream
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 7 * * 1"
+
+concurrency:
+  group: sync-upstream-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -22,13 +24,17 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: Sync upstream master
+      - name: Rebase main onto upstream master
         run: |
           git remote add upstream https://github.com/ChaoningZhang/MobileSAM.git || true
           git fetch upstream master
           git checkout main
           before=$(git rev-parse HEAD)
-          git rebase upstream/master
+          if ! git rebase upstream/master; then
+            git rebase --abort
+            echo "The mirror has diverged from upstream/master and requires manual conflict resolution."
+            exit 1
+          fi
           after=$(git rev-parse HEAD)
           if [ "$before" = "$after" ]; then
             echo "No upstream changes to apply."
